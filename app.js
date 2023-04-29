@@ -63,7 +63,7 @@ app.get('/login', (req, res) => {
 
 app.post('/login', async (req, res) => {
     //set global var to true if user is logg ed in
-    const result = await usersModel.find({
+    const result = await usersModel.findOne({
         username: req.body.username,
         password: req.body.password
     })
@@ -95,7 +95,7 @@ app.get('/authenticated', authenticatedOnly, (req, res) => {
 
 //check if user is an Administator
 const authenticatedAdminOnly = async (req, res, next) => {
-    const result = await usersModel.find({
+    const result = await usersModel.findOne({
         username: req.session.loggedUsername,
         password: req.session.loggedPassword
     })
