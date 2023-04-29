@@ -16,7 +16,17 @@ app.use(session({
     resave: false,
 }));
 
-
+// Users database array
+const users = [
+    {
+        username: 'Bobz',
+        password: 'Pie',
+    },
+    {
+        username: 'admin',
+        password: 'admin',
+    }
+]
 /////////////////////////
 // Public Routes
 /////////////////////////
@@ -48,18 +58,19 @@ app.get('/login', (req, res) => {
 // GLOBAL_AUTHENTICATED = false;
 app.post('/login', (req, res) => {
     //set global var to true if user is logged in
-    if (req.body.username === 'Bobz' && req.body.password === 'Pie') {
+    // if (req.body.username === 'Bobz' && req.body.password === 'Pie') {
+    if (users.find((user) => user.username === req.body.username && user.password === req.body.password)){
         req.session.GLOBAL_AUTHENTICATED = true;
     }
     res.redirect('/authenticated');
 });
 
 /////////////////////////
-// only for authenticated users
+// Authenticated users only
 /////////////////////////
 const authenticatedOnly = (req, res, next) => {
     // TODO: check if user is authenticated
-    if (req.session.GLOBAL_AUTHENTICATED === false) {
+    if (!req.session.GLOBAL_AUTHENTICATED) {
         return res.status(401).json({ error: 'Not authenticated' });
     }
     next(); //allow next route to run
