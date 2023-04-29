@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
+const usersModel = require('./models/users');
 const bcrypt = require('bcrypt');
 
 
@@ -16,24 +17,29 @@ app.use(session({
     resave: false,
 }));
 
+
+//TODO: connect to mongoDB database and store users in there 
+// and store session data in there too
+
 // Users database array
-const users = [
-    {
-        username: 'Bobz',
-        password: 'Pie',
-    },
-    {
-        username: 'admin',
-        password: 'admin',
-    }
-]
+// const users = [
+//     {
+//         username: 'Bobz',
+//         password: 'Pie',
+//         type: 'regural user',
+//     },
+//     {
+//         username: 'admin',
+//         password: 'admin',
+//         type: 'admin user',
+//     }
+// ]
 /////////////////////////
 // Public Routes
 /////////////////////////
 
 // Landing page
 app.get('/', (req, res) => {
-    // send two buttons one for sign up and one for login that will redirect to the respective pages
     res.send(
         `
         <h1>Welcome to whatever this is...</h1>
@@ -55,12 +61,16 @@ app.get('/login', (req, res) => {
     `)
 });
 
-// GLOBAL_AUTHENTICATED = false;
-app.post('/login', (req, res) => {
-    //set global var to true if user is logged in
-    // if (req.body.username === 'Bobz' && req.body.password === 'Pie') {
-    if (users.find((user) => user.username === req.body.username && user.password === req.body.password)){
+app.post('/login', async (req, res) => {
+    //set global var to true if user is logg ed in
+    const result = await usersModel.find({
+        username: req.body.username,
+        password: req.body.password
+    })
+    if (result) {
         req.session.GLOBAL_AUTHENTICATED = true;
+        req.session.loggedUsername = req.body.username;
+        req.session.loggedPassword = req.body.password;
     }
     res.redirect('/authenticated');
 });
@@ -83,9 +93,39 @@ app.get('/authenticated', authenticatedOnly, (req, res) => {
 });
 
 
+//check if user is an Administator
+const authenticatedAdminOnly = async (req, res, next) => {
+    const result = await usersModel.find({
+        username: req.session.loggedUsername,
+        password: req.session.loggedPassword
+    })
+    if (result?.type != 'admin user') {
+        console.log("You are not an Admin, Harry!");
+        return res.send('<h1> You are not and admin, Harry'); //if not admin, return error
+    }
+    next(); //allow next route to run
+};
+app.use(authenticatedAdminOnly);
+app.get('/authenticatedAdminsOnly', authenticatedAdminOnly, (req, res) => {
+    console.log("You are an Admin, Harry!");
+    res.send('<h1>You are an Admin, Harry!</h1>');
+});
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Server running on port ${port}.`));
+//User Login page, if user is logged in, redirect to home page that has their name and a logout button
+// app.get('/home', (req, res) => {
+//     if (req.session.loggedIn) {
+//         res.send(
+//             `
+//             <h1>Hello, ${req.session.username}!</h1>
+//             <button type="button" onclick="location.href='members'">Go to members Area</button>
+//             <button type="button" onclick="location.href='logout'">Logout</button>
+//             `
+//         );
+//     } else {
+//         res.redirect('/');
+//     }
+// });
+
 
 
 // app.use(authenticatedSucccessfully) NEED THIS????????
@@ -103,18 +143,6 @@ app.listen(port, () => console.log(`Server running on port ${port}.`));
 //     );
 // });
 
-
-//User Login page, if user is logged in, redirect to home page that has their name and a logout button
-// app.get('/home', (req, res) => {
-//     if (req.session.loggedIn) {
-//         res.send(
-//             `
-//             <h1>Hello, ${req.session.username}!</h1>
-//             <button type="button" onclick="location.href='members'">Go to members Area</button>
-//             <button type="button" onclick="location.href='logout'">Logout</button>
-//             `
-//         );
-//     } else {
-//         res.redirect('/');
-//     }
-// });
+// const port = process.env.PORT || 3000;
+// app.listen(port, () => console.log(`App running on port ${port}.`));
+module.exports = app;
