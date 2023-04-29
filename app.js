@@ -3,37 +3,26 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const usersModel = require('./models/users');
 const bcrypt = require('bcrypt');
-
-
-
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 const app = express();
 //parse through the body of the request
 app.use(express.urlencoded({ extended: false }));
+
+// save session data in MongoDB 
+var dbStore = new MongoDBStore({
+    uri: 'mongodb://127.0.0.1:27017/connect_mongodb_session_test',
+    collection: 'mySessions'
+});
 //Deploy sessions
 app.use(session({
     secret: 'c2b1b7c7-5f2b-4b23-99e3-be2504ff5f74',
-    saveUninitialized: true,
+    store: dbStore,
     resave: false,
+    saveUninitialized: false,
 }));
 
 
-//TODO: connect to mongoDB database and store users in there 
-// and store session data in there too
-
-// Users database array
-// const users = [
-//     {
-//         username: 'Bobz',
-//         password: 'Pie',
-//         type: 'regural user',
-//     },
-//     {
-//         username: 'admin',
-//         password: 'admin',
-//         type: 'admin user',
-//     }
-// ]
 /////////////////////////
 // Public Routes
 /////////////////////////
