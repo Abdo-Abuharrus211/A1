@@ -48,7 +48,7 @@ app.get('/login', (req, res) => {
         `
         <h3>Login:</h3>
         <form action="/login" method="post">
-        input type="email" name="email" placeholder="Enter your email" />
+        <input type="email" name="email" placeholder="Enter your email" />
         <br>
         <input type="password" name="password" placeholder="Enter your password" />
         <br>
@@ -62,6 +62,7 @@ app.get('/login', (req, res) => {
 
 // //User Signup page
 app.get('/signup', (req, res) => {
+    const errorMessage = req.query.error;
     res.send(
         `
         <h3>Sign Up:</h3>
@@ -74,6 +75,7 @@ app.get('/signup', (req, res) => {
         <br>
         <input type="submit" value="Signup" />
         </form>
+        ${errorMessage ? `<p>${errorMessage}</p>` : ''}
         `);
 });
 
@@ -81,16 +83,17 @@ app.get('/signup', (req, res) => {
 app.post('/login', async (req, res) => {
     //set global var to true if user is logg ed in
     const result = await usersModel.findOne({
-        username: req.body.username,
+        email: req.body.email,
     })
     if (result && bcrypt.compareSync(req.body.password, result.password)) {
         req.session.GLOBAL_AUTHENTICATED = true;
-        req.session.loggedUsername = req.body.username;
+        req.session.loggedUsername = result.username;
+        req.session.loggedEmail = req.body.email;
         req.session.loggedPassword = req.body.password;
         res.redirect('/members');
     }
     else {
-        res.redirect('/login?error=Invalid%20email/password%20combination');
+        res.redirect('/login?error=Invalid%20username/password%20combination');
     }
 });
 
@@ -101,7 +104,8 @@ app.post('/signup', async (req, res) => {
             username: req.body.username,
         })
         if (result) {
-            res.send('<h1>Username already exists</h1>');
+            // res.send('<h1>Username already exists</h1>');
+            res.redirect('/signup?error=Username%20already%20exists');
         }
         else {
             //hash password
@@ -109,11 +113,16 @@ app.post('/signup', async (req, res) => {
             //create new user
             const newUser = new usersModel({
                 username: req.body.username,
+                email: req.body.email,
                 password: hashedPassword,
                 type: 'regular user',
             });
             //save new user
             await newUser.save();
+            req.session.GLOBAL_AUTHENTICATED = true;
+            req.session.loggedUsername = req.body.username;
+            req.session.loggedEmail = req.body.email;
+            req.session.loggedPassword = req.body.password;
             res.redirect('/members');
         }
     }
@@ -189,7 +198,7 @@ app.get('/authenticatedAdminsOnly', authenticatedAdminOnly, (req, res) => {
 app.get('*', (req, res) => {
     res.status(404).send(`
     <h1>Page not found - 404</h1>
-    <img src="404gifcat.gif" alt="Error 404 Cat pic" width="600">
+    <img src="404gifcat.gif" alt="Error 404" width="600">
     `);
 });
 
