@@ -50,19 +50,61 @@ app.get('/login', (req, res) => {
     `)
 });
 
+
+
+// //User Signup page
+app.get('/signup', (req, res) => {
+    res.send(
+        `
+        <form action="/signup" method="post">
+        <input type="text" name="username" placeholder="Enter your username" />
+        <input type="password" name="password" placeholder="Enter your password" />
+        <input type="submit" value="Signup" />
+        </form>
+        `
+    );
+});
+
+
 app.post('/login', async (req, res) => {
     //set global var to true if user is logg ed in
     const result = await usersModel.findOne({
         username: req.body.username,
-        password: req.body.password
     })
-    if (result) {
+    if (bcrypt.compareSync(req.body.password, result.password)) {
         req.session.GLOBAL_AUTHENTICATED = true;
         req.session.loggedUsername = req.body.username;
         req.session.loggedPassword = req.body.password;
+        res.redirect('/authenticated');
     }
-    res.redirect('/authenticated');
+    else {
+        res.send('<h1>Invalid username or password</h1>');
+    }
 });
+
+app.post('/signup', async (req, res) => {
+    //check if username already exists
+    const result = await usersModel.findOne({
+        username: req.body.username,
+    })
+    if (result) {
+        res.send('<h1>Username already exists</h1>');
+    }
+    else {
+        //hash password
+        const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+        //create new user
+        const newUser = new usersModel({
+            username: req.body.username,
+            password: hashedPassword,
+            type: 'regular user',
+        });
+        //save new user
+        await newUser.save();
+        res.redirect('/authenticated');  
+    }
+});
+
 
 /////////////////////////
 // Authenticated users only
@@ -86,7 +128,6 @@ app.get('/authenticated', authenticatedOnly, (req, res) => {
 const authenticatedAdminOnly = async (req, res, next) => {
     const result = await usersModel.findOne({
         username: req.session.loggedUsername,
-        password: req.session.loggedPassword
     })
     if (result?.type != 'admin user') {
         console.log("You are not an Admin, Harry!");
@@ -113,23 +154,6 @@ app.get('/authenticatedAdminsOnly', authenticatedAdminOnly, (req, res) => {
 //     } else {
 //         res.redirect('/');
 //     }
-// });
-
-
-
-// app.use(authenticatedSucccessfully) NEED THIS????????
-
-// //User Signup page
-// app.get('/signup', (req, res) => {
-//     res.send(
-//         `
-//         <form action="/signup" method="post">
-//         <input type="text" name="username" placeholder="Enter your username" />
-//         <input type="password" name="password" placeholder="Enter your password" />
-//         <input type="submit" value="Signup" />
-//         </form>
-//         `
-//     );
 // });
 
 // const port = process.env.PORT || 3000;
