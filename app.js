@@ -33,7 +33,7 @@ app.use(session({
 app.get('/', (req, res) => {
     res.send(
         `
-        <h1>Welcome to whatever this is...</h1>
+        <h1>Welcome to Cat Cookies 101, let's begin.</h1>
         <button type="button" onclick="location.href='/signup'">Sign Up</button>
         <button type="button" onclick="location.href='/login'">Login</button>
         `
@@ -121,19 +121,28 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-// I want the user to be able to logout and destroy the session 
-// then redirect to the root route 
+// I want the user to be able to logout and destroy the session from mongoDB database
+// and if the session is deleted for anyreason, the user should be logged out automatically
+// then redirect to the root route
 app.post('/logout', (req, res) => {
     req.session.destroy();
+    // delete session from MongoDB database
+    dbStore.destroy(req.sessionID, (err) => {
+        if (err) {
+            console.log(err);
+        }
+    });
     res.redirect('/');
 });
+
+
 /////////////////////////
 // Authenticated users only
 /////////////////////////
 const authenticatedOnly = (req, res, next) => {
     // TODO: check if user is authenticated
     if (!req.session.GLOBAL_AUTHENTICATED) {
-        res.status(401).send(`<h1>Error 401, Access Denied</h1>`);
+        res.redirect('/login?error=Access%20 denied%20-%20401');;
     }
     next(); //allow next route to run
 };
@@ -146,6 +155,7 @@ app.get('/members', authenticatedOnly, (req, res) => {
     res.send(`<h1>You are authenticated</h1>
              <h1> Hello, ${req.session.loggedUsername}.</h1>
              <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800">
+             <br>
             <form action="/logout" method="post">
             <input type="submit" value="Logout" />
             </form>`);
@@ -164,7 +174,7 @@ const authenticatedAdminOnly = async (req, res, next) => {
         next(); //allow next route to run
     } catch (error) {
         console.log(error);
-        res.send('<h1>Something went wrong</h1>');
+        
     };
 };
 
@@ -174,24 +184,11 @@ app.get('/authenticatedAdminsOnly', authenticatedAdminOnly, (req, res) => {
     res.send(`<h1>You are an Administrator!</h1>`);
 });
 
-//User Login page, if user is logged in, redirect to home page that has their name and a logout button
-// app.get('/home', (req, res) => {
-//     if (req.session.loggedIn) {
-//         res.send(
-//             `
-//             <h1>Hello, ${req.session.username}!</h1>
-//             <button type="button" onclick="location.href='members'">Go to members Area</button>
-//             <button type="button" onclick="location.href='logout'">Logout</button>
-//             `
-//         );
-//     } else {
-//         res.redirect('/');
-//     }
-// });
-
-
 app.get('*', (req, res) => {
-    res.status(404).send('<h1> 404 Page not found</h1>');
+    res.status(404).send(`
+    <h1> 404 Page not found</h1>
+    <img src="cat404.png" alt="Error 404" width="1000">
+    `);
 });
 
 
