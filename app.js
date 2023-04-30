@@ -34,6 +34,8 @@ app.get('/', (req, res) => {
     res.send(
         `
         <h1>Welcome to Cat Cookies 101, let's begin.</h1>
+        <br>
+        <img src="bashaBanner.JPG" alt="Basha" width="1000">
         <button type="button" onclick="location.href='/signup'">Sign Up</button>
         <button type="button" onclick="location.href='/login'">Login</button>
         `
