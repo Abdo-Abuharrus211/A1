@@ -3,9 +3,12 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const usersModel = require('./models/users');
 const bcrypt = require('bcrypt');
+const Joi = require('joi');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const dotenv = require('dotenv');
 dotenv.config();
+
+const expireTime = 24 * 60 * 60 * 1000; //expires after 1 day  (hours * minutes * seconds * millis)
 
 const app = express();
 //parse through the body of the request
@@ -78,17 +81,37 @@ app.get('/signup', (req, res) => {
 
 app.post('/login', async (req, res) => {
     //set global var to true if user is logg ed in
-    const result = await usersModel.findOne({
-        username: req.body.username,
+    // sanitize the input using Joi
+    const schema = Joi.object({
+        password: Joi.string()
     })
-    if (result && bcrypt.compareSync(req.body.password, result.password)) {
-        req.session.GLOBAL_AUTHENTICATED = true;
-        req.session.loggedUsername = req.body.username;
-        req.session.loggedPassword = req.body.password;
-        res.redirect('/members');
+
+    try {
+        console.log("req.body.password " + req.body.password);
+        const value = await schema.validateAsync({ password: req.body.password });
     }
-    else {
-        res.redirect('/login?error=Invalid%20username/password%20combination');
+    catch (err) {
+        console.log(err);
+        console.log("The password has to be a string");
+        return
+    }
+
+    try {
+        const result = await usersModel.findOne({
+            username: req.body.username
+        })
+        if (result && bcrypt.compareSync(req.body.password, result.password)) {
+            req.session.GLOBAL_AUTHENTICATED = true;
+            req.session.loggedUsername = req.body.username;
+            req.session.loggedPassword = req.body.password;
+            req.session.cookie.maxAge = expireTime;
+            res.redirect('/members');
+        }
+        else {
+            res.redirect('/login?error=Invalid%20username/password%20combination');
+        }
+    } catch (error) {
+        console.log(error);
     }
 });
 
@@ -112,6 +135,10 @@ app.post('/signup', async (req, res) => {
             });
             //save new user
             await newUser.save();
+            // log in the newly created user automatically by creating a new session then redirect to members page
+            req.session.GLOBAL_AUTHENTICATED = true;
+            req.session.loggedUsername = req.body.username;
+            req.session.loggedPassword = req.body.password;
             res.redirect('/members');
         }
     }
@@ -174,7 +201,7 @@ const authenticatedAdminOnly = async (req, res, next) => {
         next(); //allow next route to run
     } catch (error) {
         console.log(error);
-        
+
     };
 };
 
