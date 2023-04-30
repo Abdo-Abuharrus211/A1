@@ -11,12 +11,12 @@ app.use(express.urlencoded({ extended: false }));
 
 // save session data in MongoDB 
 var dbStore = new MongoDBStore({
-    uri: 'mongodb://127.0.0.1:27017/connect_mongodb_session_test',
+    uri: `mongodb+srv://${process.env.ATLAS_DB_USER}:${process.env.ATLAS_DB_PASSWORD}@cluster0.ozsghtt.mongodb.net/comp2537a1?retryWrites=true&w=majority`,
     collection: 'mySessions'
 });
 //Deploy sessions
 app.use(session({
-    secret: 'c2b1b7c7-5f2b-4b23-99e3-be2504ff5f74',
+    secret: `${process.env.SESSIONS_SECRET}`, 
     store: dbStore,
     resave: false,
     saveUninitialized: false,
@@ -71,7 +71,7 @@ app.post('/login', async (req, res) => {
     const result = await usersModel.findOne({
         username: req.body.username,
     })
-    if (bcrypt.compareSync(req.body.password, result.password)) {
+    if (result && bcrypt.compareSync(req.body.password, result.password)) {
         req.session.GLOBAL_AUTHENTICATED = true;
         req.session.loggedUsername = req.body.username;
         req.session.loggedPassword = req.body.password;
@@ -118,11 +118,16 @@ const authenticatedOnly = (req, res, next) => {
 };
 
 app.use(authenticatedOnly);
+// This allows express to serve files in the public folder
+app.use(express.static('public'));
 app.get('/authenticated', authenticatedOnly, (req, res) => {
     console.log("You are authenticated");
-    res.send('<h1>You are authenticated</h1>');
-});
+    res.send(`<h1>You are authenticated</h1>
+             <h1> Hello, ${req.session.loggedUsername}.</h1>
+             <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800">
 
+    `);
+});
 
 //check if user is an Administator
 const authenticatedAdminOnly = async (req, res, next) => {
@@ -158,4 +163,8 @@ app.get('/authenticatedAdminsOnly', authenticatedAdminOnly, (req, res) => {
 
 // const port = process.env.PORT || 3000;
 // app.listen(port, () => console.log(`App running on port ${port}.`));
+
+app.get('*', (req, res) => {
+    res.status(404).send('<h1> 404 Page not found</h1>');
+  });
 module.exports = app;
