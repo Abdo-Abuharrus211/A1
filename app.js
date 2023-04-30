@@ -43,6 +43,7 @@ app.get('/', (req, res) => {
 
 //User Login page
 app.get('/login', (req, res) => {
+    const errorMessage = req.query.error;
     res.send(
         `
         <h3>Login:</h3>
@@ -53,6 +54,7 @@ app.get('/login', (req, res) => {
         <br>
         <input type="submit" value="Login"/>
         </form>
+        ${errorMessage ? `<p>${errorMessage}</p>` : ''}
         `)
 });
 
@@ -86,7 +88,7 @@ app.post('/login', async (req, res) => {
         res.redirect('/members');
     }
     else {
-        res.render('<h1>Invalid username/password combination!</h1>');
+        res.redirect('/login?error=Invalid%20username/password%20combination');
     }
 });
 
