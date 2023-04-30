@@ -163,10 +163,12 @@ app.get('/authenticatedAdminsOnly', authenticatedAdminOnly, (req, res) => {
 //     }
 // });
 
-// const port = process.env.PORT || 3000;
-// app.listen(port, () => console.log(`App running on port ${port}.`));
 
 app.get('*', (req, res) => {
     res.status(404).send('<h1> 404 Page not found</h1>');
-  });
+});
+
+
+// const port = process.env.PORT || 3000;
+// app.listen(port, () => console.log(`App running on port ${port}.`));
 module.exports = app;
