@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const usersModel = require('./models/users');
 const bcrypt = require('bcrypt');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
 //parse through the body of the request
@@ -11,7 +13,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // save session data in MongoDB 
 var dbStore = new MongoDBStore({
-    uri: `mongodb+srv://${process.env.ATLAS_DB_USER}:${process.env.ATLAS_DB_PASSWORD}@cluster0.ozsghtt.mongodb.net/comp2537a1?retryWrites=true&w=majority`,
+    uri: `mongodb+srv://${process.env.ATLAS_DB_USER}:${process.env.ATLAS_DB_PASSWORD}@cluster0.ozsghtt.mongodb.net/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`,
     collection: 'mySessions'
 });
 //Deploy sessions
