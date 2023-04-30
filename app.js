@@ -121,14 +121,19 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-
+// I want the user to be able to logout and destroy the session 
+// then redirect to the root route 
+app.post('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
+});
 /////////////////////////
 // Authenticated users only
 /////////////////////////
 const authenticatedOnly = (req, res, next) => {
     // TODO: check if user is authenticated
     if (!req.session.GLOBAL_AUTHENTICATED) {
-        return res.status(401).json({ error: 'Not authenticated' });
+        res.status(401).send(`<h1>Error 401, Access Denied</h1>`);
     }
     next(); //allow next route to run
 };
