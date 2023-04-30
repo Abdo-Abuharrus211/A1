@@ -48,7 +48,7 @@ app.get('/login', (req, res) => {
         `
         <h3>Login:</h3>
         <form action="/login" method="post">
-        <input type="text" name="username" placeholder="Enter your username" />
+        input type="email" name="email" placeholder="Enter your email" />
         <br>
         <input type="password" name="password" placeholder="Enter your password" />
         <br>
@@ -67,6 +67,8 @@ app.get('/signup', (req, res) => {
         <h3>Sign Up:</h3>
         <form action="/signup" method="post">
         <input type="text" name="username" placeholder="Enter your username" />
+        <br>
+        <input type="email" name="email" placeholder="Enter your email" />
         <br>
         <input type="password" name="password" placeholder="Enter your password" />
         <br>
@@ -88,7 +90,7 @@ app.post('/login', async (req, res) => {
         res.redirect('/members');
     }
     else {
-        res.redirect('/login?error=Invalid%20username/password%20combination');
+        res.redirect('/login?error=Invalid%20email/password%20combination');
     }
 });
 
