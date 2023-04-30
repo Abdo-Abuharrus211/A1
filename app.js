@@ -154,7 +154,7 @@ app.get('/members', authenticatedOnly, (req, res) => {
     console.log("You are authenticated");
     res.send(`<h1>You are authenticated</h1>
              <h1> Hello, ${req.session.loggedUsername}.</h1>
-             <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800">
+             <img src="basha00${Math.floor(Math.random() * 7) + 1}.JPG" alt="Basha" width="800">
              <br>
             <form action="/logout" method="post">
             <input type="submit" value="Logout" />
@@ -187,7 +187,7 @@ app.get('/authenticatedAdminsOnly', authenticatedAdminOnly, (req, res) => {
 app.get('*', (req, res) => {
     res.status(404).send(`
     <h1> 404 Page not found</h1>
-    <img src="cat404.png" alt="Error 404" width="1000">
+    <img src="404gifcat.gif" alt="Error 404" width="1000">
     `);
 });
 
