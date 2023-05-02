@@ -163,61 +163,68 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/signup', async (req, res) => {
-    try {
-        //check if username already exists
-        const result = await usersModel.findOne({
-            username: req.body.username,
-        })
-        if (result) {
-            // res.send('<h1>Username already exists</h1>');
-            res.redirect('/signup?error=Username%20already%20exists');
-        }
-        else {
-            //hash password
-            const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-            //create new user
-            const newUser = new usersModel({
-                username: req.body.username,
-                email: req.body.email,
-                password: hashedPassword,
-                type: 'regular user',
-            });
-            //save new user
-            await newUser.save();
-            req.session.GLOBAL_AUTHENTICATED = true;
-            req.session.loggedUsername = req.body.username;
-            req.session.loggedEmail = req.body.email;
-            req.session.loggedPassword = req.body.password;
-            res.redirect('/members');
-        }
-    }
-    catch (err) {
-        console.log(err);
-        res.send('<h1>Something went wrong</h1>');
-    }
-});
+// app.post('/signup', async (req, res) => {
+//     try {
+//         //check if username already exists
+//         const result = await usersModel.findOne({
+//             username: req.body.username,
+//         })
+//         if (result) {
+//             // res.send('<h1>Username already exists</h1>');
+//             res.redirect('/signup?error=Username%20already%20exists');
+//         }
+//         else {
+//             //hash password
+//             const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+//             //create new user
+//             const newUser = new usersModel({
+//                 username: req.body.username,
+//                 email: req.body.email,
+//                 password: hashedPassword,
+//                 type: 'regular user',
+//             });
+//             //save new user
+//             await newUser.save();
+//             req.session.GLOBAL_AUTHENTICATED = true;
+//             req.session.loggedUsername = req.body.username;
+//             req.session.loggedEmail = req.body.email;
+//             req.session.loggedPassword = req.body.password;
+//             res.redirect('/members');
+//         }
+//     }
+//     catch (err) {
+//         console.log(err);
+//         res.send('<h1>Something went wrong</h1>');
+//     }
+// });
 
 app.post('/signup', async (req, res) => {
     try {
         const schema = Joi.object({
             username: Joi.string().alphanum().max(30).required(),
-            password: Joi.string().max(30).required(),
+            email: Joi.string().required(),
+            password: Joi.string().alphanum().max(30).required(),
         });
+
+        const newUser = {
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password,
+        };
+
+        // If validation fails, redirect to signup page with error message
+        const validationResult = schema.validate(newUser);
+        if (validationResult.error != null) {
+            console.log(validationResult.error);
+            res.redirect(`/signup?error=${encodeURIComponent(validationResult.error.details[0].message)}`);
+            return;
+        }
 
         const result = await usersModel.findOne({
             username: req.body.username,
             email: req.body.email,
             password: req.body.password,
         });
-
-        // If validation fails, redirect to signup page with error message
-        const validationResult = schema.validate(result);
-        if (validationResult.error != null) {
-            console.log(validationResult.error);
-            res.redirect(`/signup?error=${encodeURIComponent(validationResult.error.details[0].message)}`);
-            return;
-        }
 
         if (result) {
             // res.send('<h1>Username already exists</h1>');
@@ -289,7 +296,6 @@ app.get('/members', authenticatedOnly, (req, res) => {
             </form>`);
 });
 
-// 
 //check if user is an Administator
 // const authenticatedAdminOnly = async (req, res, next) => {
 //     // add try catch to handle errors
@@ -312,19 +318,42 @@ app.get('/members', authenticatedOnly, (req, res) => {
 //     console.log("You are an Admin, Harry!");
 //     res.send(`<h1>You are an Administrator!</h1>`);
 // });
-app.use(express.static('public'));
+
+
+// app.use(express.static('public'));
+// app.get('/*', (req, res) => {
+//     res.status(404).send(
+//         `
+//         <h2>Page not found - 404</h2>
+//         <img src="cat404.gif" alt="404 cat gif" width="800">
+//         <a href="/">Go back</a>
+//         `
+//     );
+// });
+
+// give me a new snippet for 404 page that redirects to members page if user is logged in and root if not
 app.get('/*', (req, res) => {
-    res.status(404).send(
-        `
-        <h2>Page not found - 404</h2>
-        <img src="cat404.gif" alt="404 cat gif" width="800">
-        <a href="/">Go back</a>
-        `
-    );
+    if (req.session.GLOBAL_AUTHENTICATED) {
+        {
+            res.status(404).send(
+                `
+                <h2>Page not found - 404</h2>
+                <img src="cat404.gif" alt="404 cat gif" width="800">
+                <a href="/members">Go back</a>
+                `
+            );
+        }    }
+    else {
+        res.status(404).send(
+            `
+            <h2>Page not found - 404</h2>
+            <img src="cat404.gif" alt="404 cat gif" width="800">
+            <a href="/">Go back</a>
+            `
+        );
+    }
 });
 
-
-
-// const port = process.env.PORT || 3000;
-// app.listen(port, () => console.log(`App running on port ${port}.`));
-module.exports = app;
+    // const port = process.env.PORT || 3000;
+    // app.listen(port, () => console.log(`App running on port ${port}.`));
+    module.exports = app;
