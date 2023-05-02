@@ -296,6 +296,7 @@ app.get('/members', authenticatedOnly, (req, res) => {
             </form>`);
 });
 
+// 
 //check if user is an Administator
 // const authenticatedAdminOnly = async (req, res, next) => {
 //     // add try catch to handle errors
@@ -318,42 +319,19 @@ app.get('/members', authenticatedOnly, (req, res) => {
 //     console.log("You are an Admin, Harry!");
 //     res.send(`<h1>You are an Administrator!</h1>`);
 // });
-
-
-// app.use(express.static('public'));
-// app.get('/*', (req, res) => {
-//     res.status(404).send(
-//         `
-//         <h2>Page not found - 404</h2>
-//         <img src="cat404.gif" alt="404 cat gif" width="800">
-//         <a href="/">Go back</a>
-//         `
-//     );
-// });
-
-// give me a new snippet for 404 page that redirects to members page if user is logged in and root if not
+app.use(express.static('public'));
 app.get('/*', (req, res) => {
-    if (req.session.GLOBAL_AUTHENTICATED) {
-        {
-            res.status(404).send(
-                `
-                <h2>Page not found - 404</h2>
-                <img src="cat404.gif" alt="404 cat gif" width="800">
-                <a href="/members">Go back</a>
-                `
-            );
-        }    }
-    else {
-        res.status(404).send(
-            `
-            <h2>Page not found - 404</h2>
-            <img src="cat404.gif" alt="404 cat gif" width="800">
-            <a href="/">Go back</a>
-            `
-        );
-    }
+    res.status(404).send(
+        `
+        <h2>Page not found - 404</h2>
+        <img src="cat404.gif" alt="404 cat gif" width="800">
+        <a href="/">Go back</a>
+        `
+    );
 });
 
-    // const port = process.env.PORT || 3000;
-    // app.listen(port, () => console.log(`App running on port ${port}.`));
-    module.exports = app;
+
+
+// const port = process.env.PORT || 3000;
+// app.listen(port, () => console.log(`App running on port ${port}.`));
+module.exports = app;
