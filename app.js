@@ -282,7 +282,7 @@ app.get('/members', authenticatedOnly, (req, res) => {
     console.log("You are authenticated");
     res.send(`<h1>You are authenticated</h1>
              <h1> Hello, ${req.session.loggedUsername}.</h1>
-             <img src="basha00${Math.floor(Math.random() * 7) + 1}.JPG" alt="Basha" width="800">
+             <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800">
              <br>
             <form action="/logout" method="post">
             <input type="submit" value="Logout" />
@@ -312,18 +312,19 @@ app.get('/members', authenticatedOnly, (req, res) => {
 //     console.log("You are an Admin, Harry!");
 //     res.send(`<h1>You are an Administrator!</h1>`);
 // });
-
+app.use(express.static('public'));
 app.get('/*', (req, res) => {
-    res.status(404);
-    res.send(
+    res.status(404).send(
         `
         <h2>Page not found - 404</h2>
-        <img src"404cat.gif" alt="404gifcat">
+        <img src="public/404cat.gif" alt="404gifcat">
+        <img src="cat404.jpg" alt="404 cat image">
         <br>
         <a href="/">Go back</a>
         `
     )
 });
+
 
 
 // const port = process.env.PORT || 3000;
