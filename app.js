@@ -317,12 +317,10 @@ app.get('/*', (req, res) => {
     res.status(404).send(
         `
         <h2>Page not found - 404</h2>
-        <img src="public/404cat.gif" alt="404gifcat">
-        <img src="cat404.jpg" alt="404 cat image">
-        <br>
+        <img src="cat404.gif" alt="404 cat gif" width="800">
         <a href="/">Go back</a>
         `
-    )
+    );
 });
 
 
