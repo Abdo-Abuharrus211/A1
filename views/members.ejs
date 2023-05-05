@@ -4,10 +4,9 @@
     <!-- <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800"> -->
     <!-- <%- catPic %> -->
 
-    <div class="container">
+    <div class="container shadow-lg content-box">
         <div class="row">
-
-            <div class="container-fluid content-box">
+            <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-4">
                         <img class="content-pic" src="images/basha001.JPG">
@@ -20,10 +19,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <form action="/logout" method="post">
+        <button class="btn btn-outline-danger logout-btn" type="submit">Log out</button>
+    </form>
 
-            <br>
-            <form action="/logout" method="post">
-                <button class="btn btn-outline-danger" type="submit">Log out</button>
-            </form>
-
-            <%- include('partials/footer') %>
+    <%- include('partials/footer') %>
