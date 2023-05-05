@@ -153,9 +153,6 @@ app.post('/signup', async (req, res) => {
 
         const result = await usersModel.findOne({
             username: req.body.username,
-            email: req.body.email,
-            password: req.body.password,
-            type: 'regular user',
         });
 
         if (result) {
