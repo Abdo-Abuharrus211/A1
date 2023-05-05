@@ -274,14 +274,16 @@ function validateAdmin(req, res, next) {
 app.use('/members', validateSession);
 app.get('/members', (req, res) => {
     randomCatImage = `<img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800">`;
-    res.render('members', { title: 'Members' , catPic: randomCatImage});});
+    res.render('members', { title: 'Members', catPic: randomCatImage });
+});
 
+// Getting admin if user is authenticated and admin
+app.use('/admin', validateSession, validateAdmin);
+app.get('/admin', async (req, res) => {
+    const result = await usersModel.find().project({ username: 1, type: 1, _id: 1 }).toArray();
+    res.render('admin', { title: 'Admin Control Panel', users: result });
+});
 
-    app.get('/admin', async(req, res) => {
-        const result = await usersModel.find().project({ username: 1, type: 1, _id: 1 }).toArray();
-        res.render('admin', { title: 'Admin Control Panel', users: result });
-    });
-    
 
 
 
