@@ -114,7 +114,6 @@ app.post('/login', async (req, res) => {
     const result = await usersModel.findOne({
         email: req.body.email,
     })
-    console.log(result);
     if (result && bcrypt.compareSync(req.body.password, result.password)) {
         req.session.GLOBAL_AUTHENTICATED = true;
         req.session.loggedUsername = result.username;
