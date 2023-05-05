@@ -155,6 +155,7 @@ app.post('/signup', async (req, res) => {
             username: req.body.username,
             email: req.body.email,
             password: req.body.password,
+            type: 'regular user',
         });
 
         if (result) {
@@ -177,7 +178,7 @@ app.post('/signup', async (req, res) => {
             req.session.loggedUsername = req.body.username;
             req.session.loggedEmail = req.body.email;
             req.session.loggedPassword = req.body.password;
-            req.session.type = result.type;
+            req.session.type = "regular user";
             res.redirect('/members');
         }
     }
@@ -241,16 +242,9 @@ function validateAdmin(req, res, next) {
 }
 
 
-
-
 /////////////////////////
 // Authenticated users only
 /////////////////////////
-
-
-
-///// New EJS routes
-
 
 //Getting members if user is authenticated
 app.use('/members', validateSession);
@@ -297,66 +291,7 @@ app.get('/members/admin', (req, res) => {
     res.redirect('/admin');
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const authenticatedOnly = (req, res, next) => {
-//     // TODO: check if user is authenticated
-//     if (!req.session.GLOBAL_AUTHENTICATED) {
-//         res.redirect('/login?error=Access%20 denied%20-%20401');;
-//     }
-//     next(); //allow next route to run
-// };
-
-// app.use(authenticatedOnly);
-// // This allows express to serve files in the public folder
-// app.use(express.static('public'));
-// app.get('/members', authenticatedOnly, (req, res) => {
-//     console.log("You are authenticated");
-//     res.send(`<h1>You are authenticated</h1>
-//              <h1> Hello, ${req.session.loggedUsername}.</h1>
-//              <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800">
-//              <br>
-//             <form action="/logout" method="post">
-//             <input type="submit" value="Logout" />
-//             </form>`);
-// });
-
-// 
-//check if user is an Administator
-// const authenticatedAdminOnly = async (req, res, next) => {
-//     // add try catch to handle errors
-//     try {
-//         const result = await usersModel.findOne({ username: req.session.loggedUsername }
-//         )
-//         if (result?.type != 'admin user') {
-//             console.log("You are not an Admin, Harry!");
-//             return res.send(`<h1> You are not and admin, ${result.username}`); //if not admin, return error
-//         }
-//         next(); //allow next route to run
-//     } catch (error) {
-//         console.log(error);
-
-//     };
-// };
-
-// app.use(authenticatedAdminOnly);
-// app.get('/authenticatedAdminsOnly', authenticatedAdminOnly, (req, res) => {
-//     console.log("You are an Admin, Harry!");
-//     res.send(`<h1>You are an Administrator!</h1>`);
-// });
+// 404 page
 app.use(express.static('public'));
 // app.get('/*', '/members/*', (req, res) => {
 app.get('/*', (req, res) => {

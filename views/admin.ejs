@@ -17,11 +17,11 @@
                     </div>
                     <div class="col">
                         <form action="/admin/promote?id=<%= users[i].id %>" method="POST">
-                            <button type="submit">Promote</button>
+                            <button class="btn btn-success promo-btn" type="submit">Promote</button>
                         </form>
 
                         <form action="/admin/demote?id=<%= users[i].id %>" method="POST">
-                            <button type="submit">Demote</button>
+                            <button class="btn btn-danger demo-btn" type="submit">Demote</button>
                         </form>
                     </div>
                     <!-- <button type="button" onclick="location.href='/admin/<%= users[i].id %>'">Edit</button>
