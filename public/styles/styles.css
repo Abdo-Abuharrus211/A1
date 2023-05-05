@@ -1,21 +1,25 @@
-html {
-    padding: 0;
-    margin: 0;
-    height: 100%;
-}
-
 body {
-    padding: 0;
-    margin: 0;
-    height: 100%;
-    background-color: #F7F7F7;
+    /* background-color: #F7F7F7; */
 }
 
 footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    padding: 0;
+    margin: 0;
+}
+
+
+/* //////////////////////////////////// */
+/* Partials */
+/* //////////////////////////////////// */
+.my-navbar {
+    background-color: #F7F7F7;
+    border-bottom: 2px solid #B85C38;
+}
+
+.my-footer{
+    /* background-color: #F7F7F7; */
+    border-top: 2px solid #B85C38;
+    border-bottom: 2px solid #B85C38;
 }
 
 
@@ -30,14 +34,16 @@ footer {
 /* //////////////////////////////////// */
 /* Sign Up and Login Page */
 /* //////////////////////////////////// */
-#sign-up-form,#login-form {
+#sign-up-form,
+#login-form {
     margin: 20% auto;
     width: 50%;
     padding: 20px;
     background-color: #fff;
     border-radius: 10px;
 }
-.field-input{
+
+.field-input {
     margin: 5px;
 }
 
@@ -45,19 +51,28 @@ footer {
 /* //////////////////////////////////// */
 /* Members */
 /* //////////////////////////////////// */
-.content-box{
+.content-box {
     border-radius: 10px;
 }
-.content-pic{
+
+.content-pic {
     width: 100%;
     border-radius: 10px;
 }
 
 
-.logout-btn{
+.logout-btn {
     margin: 2%;
 }
 
 
 
 /* //////////////////////////////////// */
+
+/* // when the screen is smaller than 768px make footer responsive and text smaller and center it */
+@media screen and (max-width: 768px) {
+    footer {
+        text-align: center;
+        font-size: 0.8em;
+    }
+}
