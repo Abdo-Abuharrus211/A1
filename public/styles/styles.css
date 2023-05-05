@@ -1,0 +1,45 @@
+html {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    background-color: #F7F7F7;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+
+/* //////////////////////////////////// */
+/* Index page*/
+/* //////////////////////////////////// */
+
+.banner-txt {
+    margin: 10%;
+}
+
+/* //////////////////////////////////// */
+/* Sign Up and Login Page */
+/* //////////////////////////////////// */
+#sign-up-form,#login-form {
+    margin: 20% auto;
+    width: 50%;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+}
+.field-input{
+    margin: 5px;
+}
+
+
+

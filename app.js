@@ -37,7 +37,7 @@ app.use(session({
 
 // Landing page
 app.get('/', (req, res) => {
-    res.render('index', { title: 'Home' });
+    res.render('index', { title: 'index' });
 });
 
 app.get('/nosql-injection', async (req, res) => {

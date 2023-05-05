@@ -1,12 +1,14 @@
 <%- include('partials/header') %>
 
-    <h3>Login:</h3>
-    <form action="/login" method="post">
-        <input type="email" name="email" placeholder="Enter your email" />
-        <br>
-        <input type="password" name="password" placeholder="Enter your password" />
-        <br>
-        <input type="submit" value="Login" />
-    </form>
-    <p> <%- errorMessage%> </p>
+    <div id="login-form" class="shadow-lg text-center container-fluid">
+        <h2>Login:</h2>
+        <form action="/login" method="post">
+            <input class="field-input" type="email" name="email" placeholder="Enter your email" />
+            <br>
+            <input class="field-input" type="password" name="password" placeholder="Enter your password" />
+            <br>
+            <input class="field-input" type="submit" value="Login" />
+        </form>
+        <p> <%- errorMessage%> </p>
+    </div>
     <%- include('partials/footer') %>

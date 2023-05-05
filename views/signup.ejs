@@ -1,14 +1,16 @@
 <%- include('partials/header') %>
 
-    <h3>Sign Up:</h3>
-    <form action="/signup" method="post">
-        <input type="text" name="username" placeholder="Enter your username" />
-        <br>
-        <input type="email" name="email" placeholder="Enter your email" />
-        <br>
-        <input type="password" name="password" placeholder="Enter your password" />
-        <br>
-        <input type="submit" value="Signup" />
-    </form>
-    <p> <%- errorMessage %> </p>
+    <div id="sign-up-form" class="shadow-lg text-center container-fluid">
+        <h2 style="margin: 5%">Sign Up:</h2>
+        <form action="/signup" method="post">
+            <input class="field-input" type="text" name="username" placeholder="Enter your username" />
+            <br>
+            <input class="field-input" type="email" name="email" placeholder="Enter your email" />
+            <br>
+            <input class="field-input" type="password" name="password" placeholder="Enter your password" />
+            <br>
+            <input type="submit" value="Signup" />
+        </form>
+        <p> <%- errorMessage %> </p>
+    </dev>
     <%- include('partials/footer') %>
