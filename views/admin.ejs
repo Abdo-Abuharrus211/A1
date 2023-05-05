@@ -1,0 +1,14 @@
+<%= include ('partials/header') %>
+
+    <h1>This is the <%= title %>
+    </h1>
+
+    <div class="users-box container-fluid">
+        <ul>
+            <%for (let i=0; i < users.length; i++) {%>
+                <%= inlcude ('partials/user', {user: users[i]}) %>
+                    <% } %>
+        </ul>
+    </div>
+
+    <%= include ('partials/footer') %>

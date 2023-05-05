@@ -1,0 +1,12 @@
+<%= include('partials/header') %>
+
+<h1>You are authenticated</h1>
+             <h1> Hello, ${req.session.loggedUsername}.</h1>
+             <!-- <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800"> -->
+             <%= catPic %>
+             <br>
+            <form action="/logout" method="post">
+            <input type="submit" value="Logout" />
+            </form>
+
+<%= include('partials/footer') %>

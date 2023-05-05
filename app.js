@@ -37,13 +37,14 @@ app.use(session({
 
 // Landing page
 app.get('/', (req, res) => {
-    res.send(
-        `
-        <h1>Welcome to Cat Cookies 101, let's begin.</h1>
-        <button type="button" onclick="location.href='/signup'">Sign Up</button>
-        <button type="button" onclick="location.href='/login'">Login</button>
-        `
-    );
+    res.render('index', { title: 'Home' });
+    // res.send(
+    //     `
+    //     <h1>Welcome to Cat Cookies 101, let's begin.</h1>
+    //     <button type="button" onclick="location.href='/signup'">Sign Up</button>
+    //     <button type="button" onclick="location.href='/login'">Login</button>
+    //     `
+    // );
 }
 );
 
@@ -114,24 +115,6 @@ app.get('/signup', (req, res) => {
         `);
 });
 
-
-// app.post('/login', async (req, res) => {
-//     //set global var to true if user is logg ed in
-//     const result = await usersModel.findOne({
-//         email: req.body.email,
-//     })
-//     if (result && bcrypt.compareSync(req.body.password, result.password)) {
-//         req.session.GLOBAL_AUTHENTICATED = true;
-//         req.session.loggedUsername = result.username;
-//         req.session.loggedEmail = req.body.email;
-//         req.session.loggedPassword = req.body.password;
-//         res.redirect('/members');
-//     }
-//     else {
-//         res.redirect('/login?error=Invalid%20username/password%20combination');
-//     }
-// });
-
 app.post('/login', async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
@@ -158,47 +141,13 @@ app.post('/login', async (req, res) => {
         req.session.loggedUsername = result.username;
         req.session.loggedEmail = req.body.email;
         req.session.loggedPassword = req.body.password;
-        res.redirect('/members');
+        res.render('/members');
     }
     else {
         res.redirect('/login?error=Invalid%20username/password%20combination');
     }
 });
 
-// app.post('/signup', async (req, res) => {
-//     try {
-//         //check if username already exists
-//         const result = await usersModel.findOne({
-//             username: req.body.username,
-//         })
-//         if (result) {
-//             // res.send('<h1>Username already exists</h1>');
-//             res.redirect('/signup?error=Username%20already%20exists');
-//         }
-//         else {
-//             //hash password
-//             const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-//             //create new user
-//             const newUser = new usersModel({
-//                 username: req.body.username,
-//                 email: req.body.email,
-//                 password: hashedPassword,
-//                 type: 'regular user',
-//             });
-//             //save new user
-//             await newUser.save();
-//             req.session.GLOBAL_AUTHENTICATED = true;
-//             req.session.loggedUsername = req.body.username;
-//             req.session.loggedEmail = req.body.email;
-//             req.session.loggedPassword = req.body.password;
-//             res.redirect('/members');
-//         }
-//     }
-//     catch (err) {
-//         console.log(err);
-//         res.send('<h1>Something went wrong</h1>');
-//     }
-// });
 
 app.post('/signup', async (req, res) => {
     try {
@@ -271,11 +220,82 @@ app.post('/logout', (req, res) => {
     });
     res.redirect('/');
 });
+/////////////////////////
+// Middleware
+/////////////////////////
+
+function isValidSession(req) {
+    if (req.session.GLOBAL_AUTHENTICATED) {
+        return true
+    } else {
+        return false
+    }
+}
+
+function validateSession(req, res, next) {
+    if (isValidSession(req, res, next)) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
+// give me a function that checks if the user is an admin
+function isAdmin(req) {
+    if (req.session.loggedUsername === 'admin') {
+        return true
+    } else {
+        return false
+    }
+}
+
+function validateAdmin(req, res, next) {
+    if (isAdmin(req, res, next)) {
+        next();
+    } else {
+        // show message that you are not an admin
+        res.send(`<h1> You are not an admin, ${req.session.loggedUsername}`);
+    }
+}
+
+
 
 
 /////////////////////////
 // Authenticated users only
 /////////////////////////
+
+
+
+///// New EJS routes
+
+
+//Getting members if user is authenticated
+app.use('/members', validateSession);
+app.get('/members', (req, res) => {
+    randomCatImage = `<img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800">`;
+    res.render('members', { title: 'Members' , catPic: randomCatImage});});
+
+
+    app.get('/admin', async(req, res) => {
+        const result = await usersModel.find().project({ username: 1, type: 1, _id: 1 }).toArray();
+        res.render('admin', { title: 'Admin Control Panel', users: result });
+    });
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const authenticatedOnly = (req, res, next) => {
     // TODO: check if user is authenticated
     if (!req.session.GLOBAL_AUTHENTICATED) {
