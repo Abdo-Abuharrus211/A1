@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const usersModel = require('./models/users');
 const bcrypt = require('bcrypt');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const ejs = require('ejs');
 const Joi = require('joi');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -11,7 +12,8 @@ dotenv.config();
 const app = express();
 //parse through the body of the request
 app.use(express.urlencoded({ extended: false }));
-
+//Setting the view engine to ejs
+app.set('view engine', 'ejs');
 // save session data in MongoDB 
 var dbStore = new MongoDBStore({
     uri: `mongodb+srv://${process.env.ATLAS_DB_USER}:${process.env.ATLAS_DB_PASSWORD}@cluster0.ozsghtt.mongodb.net/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`,
