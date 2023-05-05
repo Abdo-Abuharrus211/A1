@@ -1,14 +1,36 @@
-<%= include ('partials/header') %>
+<%- include ('partials/header') %>
 
     <h1>This is the <%= title %>
     </h1>
-
+    <button type="button" onclick="location.href='/members'">Back to Members</button>
     <div class="users-box container-fluid">
         <ul>
             <%for (let i=0; i < users.length; i++) {%>
-                <%= inlcude ('partials/user', {user: users[i]}) %>
-                    <% } %>
+                <div class="row container-fluid">
+                    <div class="col">
+                        <h5>username:<%= users[i].username %>
+                        </h5>
+                        <p>email:<%= users[i].email%>
+                        </p>
+                        <p>Role: <%= users[i].type %>
+                        </p>
+                    </div>
+                    <div class="col">
+                        <form action="/admin/promote?id=<%= users[i].id %>" method="POST">
+                            <button type="submit">Promote</button>
+                        </form>
+
+                        <form action="/admin/demote?id=<%= users[i].id %>" method="POST">
+                            <button type="submit">Demote</button>
+                        </form>
+                    </div>
+                    <!-- <button type="button" onclick="location.href='/admin/<%= users[i].id %>'">Edit</button>
+                    <button type="button" onclick="location.href='/admin/delete/<%= users[i].id %>'">Delete</button> -->
+
+                    <hr>
+                </div>
+                <% } %>
         </ul>
     </div>
 
-    <%= include ('partials/footer') %>
+    <%- include ('partials/footer') %>

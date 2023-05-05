@@ -1,5 +1,14 @@
-<%= include('partials/header') %>
+<%- include('partials/header') %>
 
-<h1>Template Page</h1>
-
-<%= include('partials/footer') %>
+    <h3>Sign Up:</h3>
+    <form action="/signup" method="post">
+        <input type="text" name="username" placeholder="Enter your username" />
+        <br>
+        <input type="email" name="email" placeholder="Enter your email" />
+        <br>
+        <input type="password" name="password" placeholder="Enter your password" />
+        <br>
+        <input type="submit" value="Signup" />
+    </form>
+    <p> <%- errorMessage %> </p>
+    <%- include('partials/footer') %>

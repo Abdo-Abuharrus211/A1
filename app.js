@@ -38,15 +38,7 @@ app.use(session({
 // Landing page
 app.get('/', (req, res) => {
     res.render('index', { title: 'Home' });
-    // res.send(
-    //     `
-    //     <h1>Welcome to Cat Cookies 101, let's begin.</h1>
-    //     <button type="button" onclick="location.href='/signup'">Sign Up</button>
-    //     <button type="button" onclick="location.href='/login'">Login</button>
-    //     `
-    // );
-}
-);
+});
 
 app.get('/nosql-injection', async (req, res) => {
     var username = req.query.user;
@@ -78,42 +70,29 @@ app.get('/nosql-injection', async (req, res) => {
     res.send(`<h1>Hello ${username}</h1>`);
 });
 
+
+/////////////////////////
+// Get Routes
+/////////////////////////
+
+
 //User Login page
 app.get('/login', (req, res) => {
     const errorMessage = req.query.error;
-    res.send(
-        `
-        <h3>Login:</h3>
-        <form action="/login" method="post">
-        <input type="email" name="email" placeholder="Enter your email" />
-        <br>
-        <input type="password" name="password" placeholder="Enter your password" />
-        <br>
-        <input type="submit" value="Login"/>
-        </form>
-        ${errorMessage ? `<p>${errorMessage}</p>` : ''}
-        `)
+    res.render('login', { title: 'Login', errorMessage: errorMessage });
 });
 
 
 // User Signup page
 app.get('/signup', (req, res) => {
     const errorMessage = req.query.error;
-    res.send(
-        `
-        <h3>Sign Up:</h3>
-        <form action="/signup" method="post">
-        <input type="text" name="username" placeholder="Enter your username" />
-        <br>
-        <input type="email" name="email" placeholder="Enter your email" />
-        <br>
-        <input type="password" name="password" placeholder="Enter your password" />
-        <br>
-        <input type="submit" value="Signup" />
-        </form>
-        ${errorMessage ? `<p>${errorMessage}</p>` : ''}
-        `);
+    res.render('signup', { title: 'Signup', errorMessage: errorMessage })
 });
+
+
+/////////////////////////
+// Post Routes
+/////////////////////////
 
 app.post('/login', async (req, res) => {
     const email = req.body.email;
@@ -141,7 +120,8 @@ app.post('/login', async (req, res) => {
         req.session.loggedUsername = result.username;
         req.session.loggedEmail = req.body.email;
         req.session.loggedPassword = req.body.password;
-        res.render('/members');
+        req.session.type = result.type;
+        res.redirect('/members');
     }
     else {
         res.redirect('/login?error=Invalid%20username/password%20combination');
@@ -197,6 +177,7 @@ app.post('/signup', async (req, res) => {
             req.session.loggedUsername = req.body.username;
             req.session.loggedEmail = req.body.email;
             req.session.loggedPassword = req.body.password;
+            req.session.type = result.type;
             res.redirect('/members');
         }
     }
@@ -240,9 +221,10 @@ function validateSession(req, res, next) {
     }
 }
 
-// give me a function that checks if the user is an admin
+// give me a function that checks if the logged in user's type is admin
+
 function isAdmin(req) {
-    if (req.session.loggedUsername === 'admin') {
+    if (req.session.type === 'admin') {
         return true
     } else {
         return false
@@ -254,7 +236,7 @@ function validateAdmin(req, res, next) {
         next();
     } else {
         // show message that you are not an admin
-        res.send(`<h1> You are not an admin, ${req.session.loggedUsername}`);
+        res.status(403).send(`<h1> You are not an admin, ${req.session.loggedUsername}!`);
     }
 }
 
@@ -273,15 +255,46 @@ function validateAdmin(req, res, next) {
 //Getting members if user is authenticated
 app.use('/members', validateSession);
 app.get('/members', (req, res) => {
+    username = req.session.loggedUsername;
     randomCatImage = `<img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800">`;
-    res.render('members', { title: 'Members', catPic: randomCatImage });
+    res.render('members', { title: 'Members', catPic: randomCatImage, username: username });
 });
 
 // Getting admin if user is authenticated and admin
 app.use('/admin', validateSession, validateAdmin);
 app.get('/admin', async (req, res) => {
-    const result = await usersModel.find().project({ username: 1, type: 1, _id: 1 }).toArray();
+    const result = await usersModel.find();
     res.render('admin', { title: 'Admin Control Panel', users: result });
+    // console.log(result);
+});
+
+// admin to promot user to admin with user id passed in the request
+app.post('/admin/promote', async (req, res) =>{
+    userId = req.query.id;
+    console.log(userId);
+    const result = await usersModel.findOneAndUpdate(
+        { _id: userId},
+        { $set: { type: 'admin' } }
+    );
+    console.log("Promoted regular user to admin");
+    res.redirect('/admin');
+});
+
+
+// admin to demote user to regular user with user id passed in the request
+app.post('/admin/demote', async (req, res) =>{
+    const userID = req.query.id;
+    console.log(userID);
+    const result = await usersModel.findOneAndUpdate(
+        { _id: userID},
+        { $set: { type: 'regular user' } }
+    );
+    console.log("Demoted admin to regular user");
+    res.redirect('/admin');
+});
+
+app.get('/members/admin', (req, res) => {
+    res.redirect('/admin');
 });
 
 
@@ -298,27 +311,28 @@ app.get('/admin', async (req, res) => {
 
 
 
-const authenticatedOnly = (req, res, next) => {
-    // TODO: check if user is authenticated
-    if (!req.session.GLOBAL_AUTHENTICATED) {
-        res.redirect('/login?error=Access%20 denied%20-%20401');;
-    }
-    next(); //allow next route to run
-};
 
-app.use(authenticatedOnly);
-// This allows express to serve files in the public folder
-app.use(express.static('public'));
-app.get('/members', authenticatedOnly, (req, res) => {
-    console.log("You are authenticated");
-    res.send(`<h1>You are authenticated</h1>
-             <h1> Hello, ${req.session.loggedUsername}.</h1>
-             <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800">
-             <br>
-            <form action="/logout" method="post">
-            <input type="submit" value="Logout" />
-            </form>`);
-});
+// const authenticatedOnly = (req, res, next) => {
+//     // TODO: check if user is authenticated
+//     if (!req.session.GLOBAL_AUTHENTICATED) {
+//         res.redirect('/login?error=Access%20 denied%20-%20401');;
+//     }
+//     next(); //allow next route to run
+// };
+
+// app.use(authenticatedOnly);
+// // This allows express to serve files in the public folder
+// app.use(express.static('public'));
+// app.get('/members', authenticatedOnly, (req, res) => {
+//     console.log("You are authenticated");
+//     res.send(`<h1>You are authenticated</h1>
+//              <h1> Hello, ${req.session.loggedUsername}.</h1>
+//              <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800">
+//              <br>
+//             <form action="/logout" method="post">
+//             <input type="submit" value="Logout" />
+//             </form>`);
+// });
 
 // 
 //check if user is an Administator
@@ -344,18 +358,14 @@ app.get('/members', authenticatedOnly, (req, res) => {
 //     res.send(`<h1>You are an Administrator!</h1>`);
 // });
 app.use(express.static('public'));
+// app.get('/*', '/members/*', (req, res) => {
 app.get('/*', (req, res) => {
-    res.status(404).send(
-        `
-        <h2>Page not found - 404</h2>
-        <img src="cat404.gif" alt="404 cat gif" width="800">
-        <a href="/">Go back</a>
-        `
-    );
+    res.status(404);
+    res.render('404', { title: '404' });
 });
 
 
-
+//Removed this cause it was causing an error due to duplicate port in server.js
 // const port = process.env.PORT || 3000;
 // app.listen(port, () => console.log(`App running on port ${port}.`));
 module.exports = app;

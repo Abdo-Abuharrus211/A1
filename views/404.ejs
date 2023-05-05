@@ -1,6 +1,7 @@
-<%= include('partials/header') %>
+<%- include('partials/header') %>
 
 <h1>Page Doesn't Exist - 404</h1>
-<img src="cat404.gif" alt="cat404">
-
-<%= include('partials/footer') %>
+<img src="./public/cat404.gif" alt="cat404">
+<!-- <img src="/public/cat404.jpg" alt=""> -->
+<button type="button" onclick="location.href='/members'">Go back</button>
+<%- include('partials/footer') %>

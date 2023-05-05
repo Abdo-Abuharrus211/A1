@@ -6,7 +6,6 @@ dotenv.config();
 
 
 main().catch(err => console.log(err));
-console.log("hello");
 async function main() {
     // await mongoose.connect('mongodb://127.0.0.1:27017/comp2537a1');
     // await mongoose.connect(`mongodb+srv://admin-abdo:cJVpswKhU6RtZAoq@cluster0.ozsghtt.mongodb.net/comp2537a1?retryWrites=true&w=majority`);  
