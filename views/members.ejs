@@ -1,12 +1,29 @@
 <%- include('partials/header') %>
 
-<h1>You are authenticated</h1>
-             <h1> Hello, <%- username%></h1>
-             <!-- <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800"> -->
-             <%- catPic %>
-             <br>
+    <h1> Hello, <%- username%></h1>
+    <!-- <img src="basha00${Math.floor(Math.random() * 4) + 1}.JPG" alt="Basha" width="800"> -->
+    <!-- <%- catPic %> -->
+
+    <div class="container">
+        <div class="row">
+
+            <div class="container-fluid content-box">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <img class="content-pic" src="images/basha001.JPG">
+                    </div>
+                    <div class="col-lg-4">
+                        <img class="content-pic" src="images/basha002.JPG">
+                    </div>
+                    <div class="col-lg-4">
+                        <img class="content-pic" src="images/basha003.JPG">
+                    </div>
+                </div>
+            </div>
+
+            <br>
             <form action="/logout" method="post">
-            <input type="submit" value="Logout" />
+                <button class="btn btn-outline-danger" type="submit">Log out</button>
             </form>
 
-<%- include('partials/footer') %>
+            <%- include('partials/footer') %>

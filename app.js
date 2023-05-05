@@ -234,7 +234,10 @@ function validateAdmin(req, res, next) {
         next();
     } else {
         // show message that you are not an admin
-        res.status(403).send(`<h1> You are not an admin, ${req.session.loggedUsername}!`);
+        res.status(403).send(`
+        <h1> You are not an admin, ${req.session.loggedUsername}!</h1>
+        <button class="btn btn-dark-outline" onclick="window.location.href='/members'">Go back</button>
+        `);
     }
 }
 
