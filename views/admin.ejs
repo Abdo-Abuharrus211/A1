@@ -6,8 +6,8 @@
     <div class="users-box container-fluid">
         <ul>
             <%for (let i=0; i < users.length; i++) {%>
-                <div class="row container-fluid">
-                    <div class="col">
+                <div class="row">
+                    <div class="col-lg-9">
                         <h5>username:<%= users[i].username %>
                         </h5>
                         <p>email:<%= users[i].email%>
@@ -15,7 +15,7 @@
                         <p>Role: <%= users[i].type %>
                         </p>
                     </div>
-                    <div class="col">
+                    <div class="col-lg-3 md-0">
                         <form action="/admin/promote?id=<%= users[i].id %>" method="POST">
                             <button class="btn btn-success promo-btn" type="submit">Promote</button>
                         </form>
